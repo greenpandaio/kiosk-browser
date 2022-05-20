@@ -1,0 +1,56 @@
+name: kiosk-browser CI
+
+on:
+  push:
+    branches: [ 'main' ]
+  # pull_request:
+  #   branches: [ 'main' ]
+
+  workflow_dispatch:
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set env for version
+      run: echo "GITHUB_APP_VERSION=$( echo ${GITHUB_REF##*/}-$(date +"%Y%m%dT%H%M") )" >> $GITHUB_ENV
+    - name: Update package.json version
+      uses: jossef/action-set-json-field@v1
+      with:
+        file: package.json
+        field: version
+        value: ${{ env.GITHUB_APP_VERSION }}
+    - name: Commit version
+      uses: EndBug/add-and-commit@v9
+      with:
+        author_name: Github Actions
+        author_email: thodoris@greenpanda.io
+        message: 'Release version ${{ env.GITHUB_APP_VERSION }}'
+        add: 'package.json'
+        tag: '${{ env.GITHUB_APP_VERSION }}'
+        push: true
+
+    - name: Docker Login
+      env: 
+        DOCKER_USER: ${{secrets.DOCKER_USER}}
+        DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+      run: |
+        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag greenpandaio/kiosk-browser:${{ env.GITHUB_APP_VERSION }}
+    - name: Tag Docker image as latest
+      run: docker tag greenpandaio/kiosk-browser:${{ env.GITHUB_APP_VERSION }} greenpandaio/kiosk-browser:latest
+    - name: Docker push version
+      run: docker push greenpandaio/kiosk-browser:${{ env.GITHUB_APP_VERSION }}
+    - name: Docker push latest
+      run: docker push greenpandaio/kiosk-browser:latest
+    
+    - name: Deploy to Heroku
+      uses: akhileshns/heroku-deploy@v3.12.12
+      with:
+        heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+        heroku_app_name: "kiosk-browser"
+        heroku_email: "thodoris@greenpanda.io"
+        buildpack: "heroku/nodejs"
