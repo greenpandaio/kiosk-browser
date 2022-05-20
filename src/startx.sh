@@ -80,5 +80,10 @@ echo "Installed browser version: $VERSION"
 
 # stop the screen blanking
 xset s off -dpms
-
+# Custom Resolution for Kiosk
+if [[ -z "$KIOSK_RESOLUTION" ]]; then
+  xrandr -s 800x600
+else
+  xrandr -s $KIOSK_RESOLUTION
+fi
 node /usr/src/app/server.js
