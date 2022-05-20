@@ -1,6 +1,6 @@
 {
   "name": "browserV2",
-  "version": "0.0.1",
+  "version": "master-20220520T1040",
   "description": "balenaBlock that provides a chromium browser wrapped in some balena genius",
   "main": "index.js",
   "scripts": {
