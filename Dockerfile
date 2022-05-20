@@ -1,6 +1,6 @@
 ARG NODEJS_VERSION="12"
 
-FROM balenalib/%%BALENA_MACHINE_NAME%%-debian-node:${NODEJS_VERSION}-buster-run
+FROM balenalib/genericx86-64-ext-debian-node:${NODEJS_VERSION}-buster-run
 
 # install required packages
 RUN install_packages \
