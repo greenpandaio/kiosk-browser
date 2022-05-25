@@ -6,6 +6,7 @@ FROM balenalib/genericx86-64-ext-debian-node:${NODEJS_VERSION}-buster-run
 RUN install_packages \
     chromium-common \
     chromium \
+    fonts-noto-color-emoji \
     libgles2-mesa \
     lsb-release \
     mesa-vdpau-drivers \
