@@ -54,6 +54,7 @@ RUN curl -skL https://raw.githubusercontent.com/balena-labs-projects/audio/maste
 ENV PULSE_SERVER=tcp:audio:4317
 
 COPY VERSION .
-
+EXPOSE 5011
+EXPOSE 35173
 # Start app
 CMD ["bash", "/usr/src/app/start.sh"]
