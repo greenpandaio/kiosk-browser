@@ -4,6 +4,7 @@ FROM balenalib/genericx86-64-ext-debian-node:${NODEJS_VERSION}-buster-run
 
 # install required packages
 RUN install_packages \
+    ssh \
     chromium-common=89.0.4389.114-1~deb10u1 \
     chromium=89.0.4389.114-1~deb10u1 \
     fonts-noto-color-emoji \
@@ -54,6 +55,7 @@ RUN curl -skL https://raw.githubusercontent.com/balenablocks/audio/master/script
 ENV PULSE_SERVER=tcp:audio:4317
 
 COPY VERSION .
-
+EXPOSE 5011
+EXPOSE 35173
 # Start app
 CMD ["bash", "/usr/src/app/start.sh"]
