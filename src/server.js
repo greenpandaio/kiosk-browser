@@ -13,6 +13,11 @@ const { readFile, unlink } = require('fs').promises;
 const path = require('path');
 const os = require('os');
 
+const chokidar = require('chokidar');
+const fs = require ('fs')
+const {exec} = require('child_process')
+
+
 // Bring in the static environment variables
 const API_PORT = parseInt(process.env.API_PORT) || 5011;
 const WINDOW_SIZE = process.env.WINDOW_SIZE || "800,600";
@@ -166,6 +171,7 @@ let launchChromium = async function(url) {
     });
       
     console.log(`Chromium remote debugging tools running on port: ${chrome.port}`);
+    browserLogging()
     currentUrl = url;
 }
 
@@ -374,6 +380,34 @@ app.post('/scan', (req, res) => {
   });
   return res.status(200).send('ok');
 });
+
+const getLightHouseDir = async (source) =>{
+  dir = fs.readdirSync(source, { withFileTypes: true });
+  return dir.filter(dirent => dirent.isDirectory()).filter(dirent => dirent.name.startsWith("lighthouse")).map(dirent => dirent.name)
+}
+
+const readLastLines = async (filename,lines)=>{
+  return new Promise((resolve,reject)=>{
+    const {stdout} = exec(`tail -${lines} ${filename}`,{ maxBuffer: 2 ** 32, encoding: 'buffer' });
+    var bufs = [];
+    stdout.on('data', function(d){ bufs.push(d); });
+    stdout.on('end', function(){
+    var buf = Buffer.concat(bufs);
+    resolve(buf)
+    })
+  })
+}
+
+async function browserLogging(){
+  let lightHouseFolders = await getLightHouseDir("/tmp/")
+  let filename = `/tmp/${lightHouseFolders[0]}/chrome-err.log`
+  const watcher = chokidar.watch(filename, { persistent: true });
+  watcher
+  .on('change', async() => {
+    await readLastLines(filename,10).then((res)=>{console.log(res.toString())})
+    fs.writeFileSync(filename, '', ()=>{})
+  })
+}
 
 app.listen(API_PORT, () => {
   console.log('Browser API running on port: ' + API_PORT);

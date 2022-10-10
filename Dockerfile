@@ -5,8 +5,8 @@ FROM balenalib/genericx86-64-ext-debian-node:${NODEJS_VERSION}-buster-run
 # install required packages
 RUN install_packages \
     ssh \
-    chromium-common=89.0.4389.114-1~deb10u1 \
-    chromium=89.0.4389.114-1~deb10u1 \
+    chromium-common=90.0.4430.212-1~deb10u1\
+    chromium=90.0.4430.212-1~deb10u1\
     fonts-noto-color-emoji \
     libgles2-mesa \
     lsb-release \
