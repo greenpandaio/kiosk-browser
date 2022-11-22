@@ -56,5 +56,6 @@ ENV PULSE_SERVER=tcp:audio:4317
 COPY VERSION .
 EXPOSE 5011
 EXPOSE 35173
+RUN ln -s /usr/lib/x86_64-linux-gnu/dri /usr/lib/dri
 # Start app
 CMD ["bash", "/usr/src/app/start.sh"]
