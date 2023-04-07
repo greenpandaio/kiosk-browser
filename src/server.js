@@ -133,6 +133,8 @@ let launchChromium = async function(url) {
       {
         console.log("Disabling GPU");
         flags.push('--disable-gpu');
+        flags.push('--disable-software-rasterizer');
+        flags.push('--disable-dev-shm-usage');
       }
       else
       {
@@ -271,7 +273,7 @@ app.get('/url', (req, res) => {
 });
 
 // refresh endpoint
-app.post('/refresh', (req, res) => {
+app.get('/refresh', (req, res) => {
  
   launchChromium(currentUrl);
   return res.status(200).send('ok');
