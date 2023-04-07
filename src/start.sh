@@ -2,6 +2,8 @@
 
 # this allows chromium sandbox to run, see https://github.com/balena-os/meta-balena/issues/2319
 sysctl -w user.max_user_namespaces=10000
+umount /dev/shm && mount -t tmpfs shm /dev/shm
+rm /tmp/.X0-lock &> /dev/null || true
 
 # Run balena base image entrypoint script
 /usr/bin/entry.sh echo "Running balena base image entrypoint..."
@@ -55,7 +57,7 @@ rm -f /data/chromium/SingletonLock
 environment=$(env | grep -v -w '_' | awk -F= '{ st = index($0,"=");print substr($1,0,st) ","}' | tr -d "\n")
 # remove the last comma
 environment="${environment::-1}"
-
+/usr/sbin/service dbus start
 # launch Chromium and whitelist the enVars so that they pass through to the su session
 su -w $environment -c "export DISPLAY=:$DISPLAY_NUM && startx /usr/src/app/startx.sh $CURSOR" - chromium
 balena-idle
